@@ -43,15 +43,15 @@
 
 ## Phase 2: Document Scanning Features
 
-### 2.1 Camera & Vision Integration
-- [ ] Implement AVFoundation camera capture
-- [ ] Add VisionKit document scanner integration
-- [ ] Create custom document detection using Vision framework
-- [ ] Build edge detection and auto-cropping
-- [ ] Implement perspective correction
-- [ ] Add multi-page scanning workflow
-- [ ] Create image enhancement (brightness, contrast, sharpness)
-- [ ] Build color mode selection (color, grayscale, black & white)
+### 2.1 Camera & Vision Integration ✅ (COMPLETE)
+- [x] Implement AVFoundation camera capture ✅ (CustomCameraScanner with AVCaptureSession)
+- [x] Add VisionKit document scanner integration ✅ (DocumentScannerManager with VNDocumentCameraViewController)
+- [x] Create custom document detection using Vision framework ✅ (VNDetectDocumentSegmentationRequest + VNDetectRectanglesRequest)
+- [x] Build edge detection and auto-cropping ✅ (Real-time rectangle detection with overlay)
+- [x] Implement perspective correction ✅ (CIPerspectiveCorrection filter)
+- [x] Add multi-page scanning workflow ✅ (VNDocumentCameraScan with page management)
+- [x] Create image enhancement (brightness, contrast, sharpness) ✅ (ImageProcessingPool integration)
+- [x] Build color mode selection (color, grayscale, black & white) ✅ (ScanMode enum with adaptive thresholding)
 
 ### 2.2 OCR & Text Recognition
 - [ ] Integrate Vision OCR for text recognition
