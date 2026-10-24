@@ -267,6 +267,19 @@ struct SettingsView: View {
                     }
                 }
 
+                // Cloud & Backup Section (Pro only)
+                if QuotaManager.shared.isPro {
+                    Section("Cloud & Backup") {
+                        NavigationLink("Cloud Sync") {
+                            SyncStatusView()
+                        }
+
+                        NavigationLink("Backup & Restore") {
+                            BackupSettingsView()
+                        }
+                    }
+                }
+
                 // About Section
                 Section("About") {
                     Link("Terms of Service", destination: URL(string: AppConfiguration.termsOfServiceURL)!)
