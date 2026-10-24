@@ -113,6 +113,13 @@ struct HomeView: View {
                     Divider()
                         .padding(.horizontal)
 
+                    // Quota Display
+                    QuotaDisplayView()
+                        .padding(.horizontal)
+
+                    Divider()
+                        .padding(.horizontal)
+
                     // Features
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Features")

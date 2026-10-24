@@ -13,7 +13,9 @@ import Combine
 
 struct ScanningInterfaceView: View {
     @StateObject private var viewModel = ScanningViewModel()
+    @ObservedObject var quotaManager = QuotaManager.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var showQuotaExceeded = false
 
     var body: some View {
         ZStack {
@@ -41,10 +43,20 @@ struct ScanningInterfaceView: View {
         .sheet(isPresented: $viewModel.showHistory) {
             ScanHistoryView(scans: viewModel.recentScans)
         }
+        .sheet(isPresented: $showQuotaExceeded) {
+            QuotaExceededView(quotaType: .scans)
+        }
         .alert("Scan Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred while scanning")
+        }
+        .onAppear {
+            // Check quota on appear
+            if !quotaManager.canScan {
+                showQuotaExceeded = true
+                dismiss()
+            }
         }
     }
 
@@ -206,8 +218,14 @@ struct ScanningInterfaceView: View {
 
             // Capture button
             Button {
-                viewModel.capture()
-                Haptics.heavy()
+                // Check quota before capturing
+                if quotaManager.canScan {
+                    viewModel.capture()
+                    Haptics.heavy()
+                } else {
+                    showQuotaExceeded = true
+                    Haptics.medium()
+                }
             } label: {
                 ZStack {
                     Circle()
@@ -337,6 +355,10 @@ class ScanningViewModel: ObservableObject {
         if recentScans.count > 10 {
             recentScans = Array(recentScans.prefix(10))
         }
+
+        // Record scan in quota manager
+        QuotaManager.shared.recordScan()
+
         Analytics.track(event: "scan_saved", parameters: ["page_count": scan.pages.count])
     }
 }
@@ -475,13 +497,6 @@ struct EdgeDetectionOverlay: View {
                     .position(point)
             }
         }
-    }
-}
-
-extension CGPoint: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(x)
-        hasher.combine(y)
     }
 }
 

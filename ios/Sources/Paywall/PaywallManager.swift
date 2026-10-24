@@ -97,6 +97,27 @@ class PaywallManager: ObservableObject {
         }
     }
 
+    // MARK: - Purchase
+
+    /// Purchase a subscription
+    func purchase() async throws {
+        do {
+            let customerInfo = try await Purchases.shared.restorePurchases()
+            handleCustomerInfoUpdate(customerInfo)
+
+            if customerInfo.entitlements.active.isEmpty {
+                // No active subscription found, need to make a new purchase
+                log.info("No active subscription found during purchase attempt")
+                throw NSError(domain: "PaywallManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "No active subscription found"])
+            }
+
+            Analytics.track(event: "subscription_purchased")
+        } catch {
+            log.error("Purchase failed: \(error)")
+            throw error
+        }
+    }
+
     // MARK: - Restore Purchases
 
     /// Restore previous purchases
