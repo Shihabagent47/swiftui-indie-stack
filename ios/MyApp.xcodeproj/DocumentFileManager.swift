@@ -25,6 +25,7 @@ actor DocumentFileManager {
         case thumbnails
         case temp
         case cache
+        case versions
         
         var url: URL {
             let baseURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -40,6 +41,8 @@ actor DocumentFileManager {
                 return baseURL.appendingPathComponent("Temp", isDirectory: true)
             case .cache:
                 return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            case .versions:
+                return baseURL.appendingPathComponent("Versions", isDirectory: true)
             }
         }
     }
@@ -54,7 +57,7 @@ actor DocumentFileManager {
     
     /// Create directory structure if it doesn't exist
     private func createDirectoryStructure() {
-        let directories: [Directory] = [.documents, .scans, .thumbnails, .temp, .cache]
+        let directories: [Directory] = [.documents, .scans, .thumbnails, .temp, .cache, .versions]
         
         for directory in directories {
             let url = directory.url
@@ -192,6 +195,21 @@ actor DocumentFileManager {
             includingPropertiesForKeys: [.fileSizeKey, .creationDateKey, .contentModificationDateKey],
             options: [.skipsHiddenFiles]
         )
+    }
+    
+    /// Get versions directory
+    func getVersionsDirectory() throws -> URL {
+        let versionsDir = Directory.versions.url
+        
+        if !fileManager.fileExists(atPath: versionsDir.path) {
+            try fileManager.createDirectory(
+                at: versionsDir,
+                withIntermediateDirectories: true,
+                attributes: [.protectionKey: FileProtectionType.complete]
+            )
+        }
+        
+        return versionsDir
     }
     
     // MARK: - File Format Detection
