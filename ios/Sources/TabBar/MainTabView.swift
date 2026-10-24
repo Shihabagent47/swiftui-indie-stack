@@ -12,64 +12,19 @@ import FirebaseAuth
 #endif
 
 struct MainTabView: View {
-    @State private var selectedTab: Int = 0
-
     var body: some View {
-        VStack(spacing: 0) {
-            // Content views - keep all views alive to preserve state
-            ZStack {
+        TabView {
+            Tab("Home", systemImage: "house") {
                 HomeView()
-                    .opacity(selectedTab == 0 ? 1 : 0)
-                    .allowsHitTesting(selectedTab == 0)
+            }
 
+            Tab("Documents", systemImage: "doc.on.doc") {
                 LibraryView()
-                    .opacity(selectedTab == 1 ? 1 : 0)
-                    .allowsHitTesting(selectedTab == 1)
+            }
 
+            Tab("Settings", systemImage: "gearshape") {
                 SettingsView()
-                    .opacity(selectedTab == 2 ? 1 : 0)
-                    .allowsHitTesting(selectedTab == 2)
             }
-
-            // Tab bar separator
-            Divider()
-
-            // Custom Tab bar
-            HStack {
-                Spacer(minLength: 0)
-
-                TabBarIcon(
-                    selectedTab: $selectedTab,
-                    assignedTab: 0,
-                    systemIconName: "house.fill",
-                    tabName: "Home",
-                    color: AppColors.tabHome
-                )
-
-                Spacer(minLength: 0)
-
-                TabBarIcon(
-                    selectedTab: $selectedTab,
-                    assignedTab: 1,
-                    systemIconName: "doc.on.doc.fill",
-                    tabName: "Documents",
-                    color: AppColors.tabLibrary
-                )
-
-                Spacer(minLength: 0)
-
-                TabBarIcon(
-                    selectedTab: $selectedTab,
-                    assignedTab: 2,
-                    systemIconName: "gearshape.fill",
-                    tabName: "Settings",
-                    color: AppColors.tabSettings
-                )
-
-                Spacer(minLength: 0)
-            }
-            .background(AppColors.backgroundPrimary)
-            .padding(.bottom, 5)
         }
         .task {
             Analytics.trackScreenView("MainTabView")
