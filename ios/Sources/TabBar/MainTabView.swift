@@ -51,8 +51,8 @@ struct MainTabView: View {
                 TabBarIcon(
                     selectedTab: $selectedTab,
                     assignedTab: 1,
-                    systemIconName: "book.fill",
-                    tabName: "Library",
+                    systemIconName: "doc.on.doc.fill",
+                    tabName: "Documents",
                     color: AppColors.tabLibrary
                 )
 
@@ -84,173 +84,137 @@ struct MainTabView: View {
 // MARK: - Placeholder Views (Replace with your implementations)
 
 struct HomeView: View {
-    var streakProvider = StreakDataProvider.shared
-    @State private var showGoalCompleted = false
-
-    /// Check if goal was already completed today
-    private var goalCompletedToday: Bool {
-        guard let lastActivity = streakProvider.streakData.lastActivityDate else {
-            return false
-        }
-        return Calendar.current.isDateInToday(lastActivity)
-    }
-
-    /// Auth status detail text for Feature Status panel
-    private var authDetailText: String {
-        if !AppConfiguration.useFirebase {
-            return "Local ID"
-        } else if AppConfiguration.enableAuth {
-            return "Apple/Google"
-        } else {
-            return "Anonymous"
-        }
-    }
+    @State private var showScanner = false
+    @State private var showOnboarding = false
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
-                    // App mascot (placeholder - replace with your own)
-                    Image("Mascot")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 120)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .shadow(radius: 4)
-                        .padding(.top)
-
-                    // Welcome header
+                    // Header
                     VStack(spacing: 8) {
-                        Text("Welcome to")
+                        Image(systemName: "doc.text.viewfinder")
+                            .font(.system(size: 60))
+                            .foregroundColor(.blue)
+                            .padding(.top)
+
+                        Text("Document Scanner")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+
+                        Text("Scan, organize, and manage your documents")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        Text("MyApp")
-                            .font(AppFonts.title)
-                        Text("See the Library tab for customization guides")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
                     }
+                    .padding(.horizontal)
 
-                    // Streak at risk banner
-                    if AppConfiguration.enableStreaks {
-                        StreakAtRiskBanner()
-                            .padding(.horizontal)
-                    }
-
-                    // Complete Goal button (demo for streak increment)
-                    if AppConfiguration.enableStreaks {
+                    // Quick Actions
+                    VStack(spacing: 16) {
+                        // Scan Document
                         Button {
-                            completeGoal()
+                            showScanner = true
+                            Haptics.medium()
                         } label: {
-                            Label(
-                                goalCompletedToday ? "Goal Completed Today!" : "Complete Goal",
-                                systemImage: goalCompletedToday ? "checkmark.circle.fill" : "target"
-                            )
-                            .frame(maxWidth: .infinity)
+                            HStack {
+                                Image(systemName: "doc.text.viewfinder")
+                                    .font(.title2)
+                                    .frame(width: 32)
+                                Text("Scan Document")
+                                    .font(.headline)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(goalCompletedToday ? .green : .orange)
-                        .disabled(goalCompletedToday)
-                        .padding(.horizontal)
+
+                        // Show Onboarding
+                        Button {
+                            showOnboarding = true
+                            Haptics.light()
+                        } label: {
+                            HStack {
+                                Image(systemName: "info.circle")
+                                    .font(.title2)
+                                    .frame(width: 32)
+                                Text("App Tutorial")
+                                    .font(.headline)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .foregroundColor(.primary)
+                            .cornerRadius(12)
+                        }
                     }
+                    .padding(.horizontal)
 
                     Divider()
                         .padding(.horizontal)
 
-                    // Feature Status
+                    // Features
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Feature Status")
+                        Text("Features")
                             .font(.headline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
 
-                        FeatureStatusRow(
-                            name: "Firebase",
-                            enabled: AppConfiguration.useFirebase,
-                            icon: "cloud.fill"
-                        )
-                        FeatureStatusRow(
-                            name: "Auth",
-                            enabled: AppConfiguration.enableAuth,
-                            icon: "person.badge.key.fill",
-                            detail: authDetailText
-                        )
-                        FeatureStatusRow(
-                            name: "RevenueCat",
-                            enabled: AppConfiguration.useRevenueCat,
-                            icon: "creditcard.fill"
-                        )
-                        FeatureStatusRow(
-                            name: "TelemetryDeck",
-                            enabled: AppConfiguration.useTelemetryDeck,
-                            icon: "chart.bar.fill"
-                        )
-                        FeatureStatusRow(
-                            name: "Streaks",
-                            enabled: AppConfiguration.enableStreaks,
-                            icon: "flame.fill",
-                            detail: streakProvider.hasStreak ? "\(streakProvider.streakData.currentStreak) days" : nil
-                        )
-                        FeatureStatusRow(
-                            name: "Library/CMS",
-                            enabled: AppConfiguration.enableLibrary,
-                            icon: "book.fill"
-                        )
-                        FeatureStatusRow(
-                            name: "Widgets",
-                            enabled: AppConfiguration.enableWidgets,
-                            icon: "square.grid.2x2.fill"
-                        )
-                        FeatureStatusRow(
-                            name: "App Review",
-                            enabled: AppConfiguration.enableAppReview,
-                            icon: "star.fill",
-                            detail: "at \(AppConfiguration.appReviewStreakThreshold)-day streak"
-                        )
+                        FeatureCard(icon: "camera.viewfinder", title: "Smart Scanning", description: "Auto edge detection and enhancement")
+                        FeatureCard(icon: "wand.and.stars", title: "PDF Editing", description: "Annotate, merge, and organize PDFs")
+                        FeatureCard(icon: "text.viewfinder", title: "OCR Text Recognition", description: "Extract text from any document")
+                        FeatureCard(icon: "arrow.up.arrow.down", title: "Format Conversion", description: "Convert between PDF, images, and more")
                     }
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
 
                     Spacer(minLength: 20)
-
-                    // Demo: Show how to trigger paywall programmatically
-                    if AppConfiguration.useRevenueCat {
-                        Button {
-                            PaywallManager.shared.triggerPaywall()
-                        } label: {
-                            Label("Show Paywall Demo", systemImage: "creditcard.fill")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .padding(.horizontal)
-                    }
                 }
                 .padding(.bottom)
             }
             .navigationTitle("Home")
-            .toolbar {
-                if AppConfiguration.enableStreaks {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        CompactStreakBadge()
-                    }
-                }
-            }
+        }
+        .sheet(isPresented: $showScanner) {
+            ScanningInterfaceView()
+        }
+        .sheet(isPresented: $showOnboarding) {
+            DocumentOnboardingView()
+        }
+        .task {
+            Analytics.trackScreenView("DocumentHome")
         }
     }
+}
 
-    private func completeGoal() {
-        // Record activity for streak (works in both local and Firebase mode)
-        if AppConfiguration.useFirebase {
-            #if canImport(Firebase)
-            FirestoreManager.shared.logActivity(type: "goal_completed")
-            #endif
-        } else {
-            streakProvider.recordLocalActivity()
+struct FeatureCard: View {
+    let icon: String
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(.blue)
+                .frame(width: 40)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text(description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
         }
-
-        showGoalCompleted = true
-        Analytics.track(event: "goal_completed")
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
 }
 
