@@ -346,15 +346,15 @@
 - [x] Add batch organization ✅ (batchOrganize with OrganizationStrategy)
 - [x] Build batch export ✅ (Integrated via ExportManager from Phase 9)
 
-### 10.2 Automation & Templates
-- [ ] Create document templates
-- [ ] Build workflow automation
-- [ ] Implement naming templates
-- [ ] Add preset configurations
-- [ ] Create custom shortcuts
-- [ ] Build scheduled tasks
-- [ ] Implement rule-based organization
-- [ ] Add macro recording
+### 10.2 Automation & Templates ✅ (COMPLETE)
+- [x] Create document templates ✅ (TemplateManager with blank/lined/grid templates)
+- [x] Build workflow automation ✅ (AutomationManager with multi-step workflows)
+- [x] Implement naming templates ✅ (NamingPattern in BatchProcessingManager)
+- [x] Add preset configurations ✅ (PresetConfiguration for scan/export/processing settings)
+- [ ] Create custom shortcuts (Siri Shortcuts integration)
+- [x] Build scheduled tasks ✅ (ScheduledTask with daily/weekly/monthly schedules)
+- [x] Implement rule-based organization ✅ (OrganizationRule with conditions/actions)
+- [ ] Add macro recording (Advanced workflow recording feature)
 
 ### 10.3 AI & Smart Features
 - [ ] Implement smart document categorization

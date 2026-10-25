@@ -400,17 +400,56 @@ struct ExportPreset: Identifiable, Codable {
     let createdDate: Date
 }
 
-struct ExportSettings {
+struct ExportSettings: Codable {
     let format: ExportFormat
     let quality: ExportQuality
     let compression: Bool
     let includeMetadata: Bool
     let pageRange: PageRange?
 
-    enum PageRange {
+    enum PageRange: Codable {
         case all
         case range(from: Int, to: Int)
         case specific([Int])
+
+        enum CodingKeys: String, CodingKey {
+            case type, from, to, pages
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let type = try container.decode(String.self, forKey: .type)
+
+            switch type {
+            case "all":
+                self = .all
+            case "range":
+                let from = try container.decode(Int.self, forKey: .from)
+                let to = try container.decode(Int.self, forKey: .to)
+                self = .range(from: from, to: to)
+            case "specific":
+                let pages = try container.decode([Int].self, forKey: .pages)
+                self = .specific(pages)
+            default:
+                throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown type")
+            }
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+
+            switch self {
+            case .all:
+                try container.encode("all", forKey: .type)
+            case .range(let from, let to):
+                try container.encode("range", forKey: .type)
+                try container.encode(from, forKey: .from)
+                try container.encode(to, forKey: .to)
+            case .specific(let pages):
+                try container.encode("specific", forKey: .type)
+                try container.encode(pages, forKey: .pages)
+            }
+        }
     }
 }
 
